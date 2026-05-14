@@ -1,8 +1,118 @@
 <html>
   <head>
-    
+    <style>
+      html {
+        text-align: center;
+      }
+      table {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      td {
+        text-align: center;
+        font-size: 200%;
+        margin: 5px;
+        border: solid black 1px;
+        width: 50px;
+        height: 50px;
+      }
+      button {
+        margin: 2px;
+        font-size: 200%;
+      }
+    </style>
   </head>
   <body>
-    <button onclick="alert(1)">Click Me</button>
+    <h1>Wardle</h1>
+    <table>
+      <tr id="start"><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td></td><td></td><td></td><td></td><td></td></tr>
+    </table>
+    <br>
+    <br>
+    <div id="keys"></div>
+    <script>
+      const word = 'FUGUE'
+      var current = ''
+      var guesses = []
+      function getRow() {
+        let row = document.getElementById('start')
+        for (let n = 0; n < guesses.length; ++n)
+          row = row.nextElementSibling
+        return row
+      }
+      for (let row of 'QWERTYUIOP ASDFGHJKL _ZXCVBNM<'.split(' ')) {
+        let div = document.createElement('div')
+        keys.appendChild(div)
+        for (let key of row) {
+          if (key === '_') {
+            let button = document.createElement('button')
+            button.type = 'button'
+            button.onclick = () => {
+              if (current.length !== 5 || guesses.length >= 6)
+                return
+              let chars = new Map()
+              for (let letter of word) {
+                if (!chars.has(letter))
+                  chars.set(letter, 1)
+                else
+                  chars.set(letter, chars.get(letter) + 1)
+              }
+              console.log(chars)
+              let row = getRow().children
+              for (let n = 0; n < 5; ++n) {
+                if (word[n] !== current[n])
+                  continue
+                chars.set(word[n], chars.get(word[n]) - 1)
+                row[n].style['background-color'] = 'green'
+              }
+              for (let n = 0; n < 5; ++n) {
+                if (word[n] === current[n])
+                  continue
+                let has = chars.has(current[n]) && chars.get(current[n]) > 0
+                if (has)
+                  chars.set(current[n], chars.get(current[n]) - 1)
+                if (has)
+                  row[n].style['background-color'] = 'yellow'
+                else
+                  row[n].style['background-color'] = '#DDDDDD'
+              }
+              guesses.push(current)
+              current = ''
+            }
+            button.appendChild(document.createTextNode('Enter'))
+            div.appendChild(button)
+          }
+          else if (key === '<') {
+            let button = document.createElement('button')
+            button.type = 'button'
+            button.onclick = () => {
+              if (!current.length || guesses.length >= 6)
+                return
+              getRow().children[current.length - 1].textContent = ''
+              current = current.substr(0, current.length - 1)
+            }
+            button.appendChild(document.createTextNode('Back'))
+            div.appendChild(button)
+          }
+          else {
+            let button = document.createElement('button')
+            button.type = 'button'
+            button.onclick = () => {
+              if (current.length >= 5 || guesses.length >= 6)
+                return
+              current += key
+              getRow().children[current.length - 1].textContent = key
+            }
+            button.appendChild(document.createTextNode(key))
+            div.appendChild(button)
+          }
+        }
+      }
+    </script>
   </body>
 </html>
